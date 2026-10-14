@@ -3,6 +3,8 @@ export type Post = {
   id: string;
   title: string;
   url: string;
+  /** 본문 앞부분 요약 (RSS description, 태그 제거·길이 제한). 따로 저장하지 않고 갱신 때마다 새로 받음 */
+  excerpt: string;
   author: string;
   /** ISO 8601 (UTC) */
   publishedAt: string;

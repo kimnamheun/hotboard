@@ -1,14 +1,28 @@
 .page {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 20px 16px 40px;
+  padding: 0 16px 40px;
 }
 
+/* 상단 고정: 로고·게시판·정렬은 그대로 두고 아래 목록만 스크롤 */
 .header {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 10;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 8px;
+  margin: 0 -16px 16px;
+  padding: 12px 16px 10px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
 }
 
 .brandRow {
@@ -20,7 +34,7 @@
 }
 
 .brand {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--accent);
@@ -31,18 +45,14 @@
   color: var(--text-3);
 }
 
-.sub {
-  font-size: 14px;
-  color: var(--text-2);
-}
-
 .chips {
   display: flex;
-  gap: 8px;
+  flex: 1 1 320px;
+  min-width: 0;
+  gap: 6px;
   overflow-x: auto;
   scrollbar-width: none;
-  margin: 0 -16px;
-  padding: 2px 16px;
+  padding: 1px 0;
 }
 
 .chips::-webkit-scrollbar {
@@ -54,8 +64,9 @@
   border: 1px solid var(--border);
   background: var(--surface);
   border-radius: 999px;
-  padding: 6px 14px;
-  font-size: 14px;
+  padding: 3px 10px;
+  font-size: 13px;
+  line-height: 1.4;
   cursor: pointer;
   white-space: nowrap;
 }
@@ -74,19 +85,20 @@
 
 .sorts {
   display: inline-flex;
-  align-self: flex-start;
+  flex: none;
   background: var(--surface-2);
-  border-radius: 10px;
-  padding: 3px;
+  border-radius: 8px;
+  padding: 2px;
   gap: 2px;
 }
 
 .sort {
   border: 0;
   background: transparent;
-  border-radius: 8px;
-  padding: 5px 12px;
-  font-size: 13px;
+  border-radius: 6px;
+  padding: 3px 9px;
+  font-size: 12px;
+  line-height: 1.4;
   color: var(--text-2);
   cursor: pointer;
 }
@@ -219,6 +231,45 @@
   margin-top: 2px;
   font-size: 12px;
   color: var(--text-3);
+}
+
+.peek {
+  border: 0;
+  background: none;
+  padding: 0;
+  font-size: 12px;
+  color: var(--text-3);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.peek:hover,
+.peek[aria-expanded="true"] {
+  color: var(--accent);
+}
+
+.excerpt {
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: var(--surface-2);
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+
+.excerpt p {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  word-break: keep-all;
+}
+
+.excerpt a {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--accent);
 }
 
 .stats {

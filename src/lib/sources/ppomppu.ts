@@ -16,7 +16,20 @@ const boards: Board[] = [
 
 const parser = new XMLParser({ ignoreAttributes: true, parseTagValue: false, trimValues: true });
 
-type RssItem = { title?: string; link?: string; author?: string; pubDate?: string; hits?: string };
+type RssItem = { title?: string; link?: string; description?: string; author?: string; pubDate?: string; hits?: string };
+
+const EXCERPT_MAX = 300;
+
+/** RSS description → 본문 앞부분 요약 (태그·엔티티 제거, 공백 정리, 길이 제한) */
+function toExcerpt(description = "") {
+  const text = decodeEntities(String(description))
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/[ \t ]+/g, " ")
+    .replace(/\s*\n\s*/g, "\n")
+    .trim();
+  return text.length > EXCERPT_MAX ? text.slice(0, EXCERPT_MAX).trimEnd() + "…" : text;
+}
 
 /** RSS 의 <hits> " [댓글|조회|추천|비추천]" (목록 화면과 대조해 순서 확인) */
 function parseHits(hits = "") {
@@ -49,6 +62,7 @@ function toPost(item: RssItem): Post | null {
     id,
     title: decodeEntities(String(item.title)),
     url,
+    excerpt: toExcerpt(item.description),
     author: decodeEntities(String(item.author ?? "")),
     publishedAt: date && !Number.isNaN(date.getTime()) ? date.toISOString() : "",
     ...parseHits(item.hits),

@@ -33,6 +33,15 @@ function formatKst(iso: string) {
 export default function FeedView({ feeds, fetchedAt }: { feeds: BoardFeed[]; fetchedAt: string }) {
   const [sort, setSort] = useState<SortKey>("likes");
   const [filter, setFilter] = useState<string>("all");
+  // 펼친 글 (화면 상태만 — 저장하지 않음)
+  const [open, setOpen] = useState<Set<string>>(() => new Set());
+  const toggle = (key: string) =>
+    setOpen((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
 
   useEffect(() => {
     try {
@@ -67,8 +76,8 @@ export default function FeedView({ feeds, fetchedAt }: { feeds: BoardFeed[]; fet
           <h1 className={styles.brand}>Hotboard</h1>
           <span className={styles.updated}>{formatKst(fetchedAt)} 기준 · 10분마다 갱신</span>
         </div>
-        <p className={styles.sub}>게시판별 최신글을 반응(추천·댓글·조회) 기준으로 정렬해 보여줍니다.</p>
 
+        <div className={styles.controls}>
         <nav className={styles.chips} aria-label="게시판">
           <button
             className={`${styles.chip} ${filter === "all" ? styles.chipOn : ""}`}
@@ -102,6 +111,7 @@ export default function FeedView({ feeds, fetchedAt }: { feeds: BoardFeed[]; fet
             </button>
           ))}
         </div>
+        </div>
       </header>
 
       <main className={`${styles.grid} ${filter !== "all" ? styles.single : ""}`}>
@@ -123,7 +133,10 @@ export default function FeedView({ feeds, fetchedAt }: { feeds: BoardFeed[]; fet
               <p className={styles.empty}>글이 없습니다</p>
             ) : (
               <ol className={styles.list}>
-                {f.posts.map((p, i) => (
+                {f.posts.map((p, i) => {
+                  const key = `${f.feedId}:${p.id}`;
+                  const isOpen = open.has(key);
+                  return (
                   <li key={p.id} className={styles.item}>
                     <span className={styles.rank}>{i + 1}</span>
                     <div className={styles.body}>
@@ -133,7 +146,26 @@ export default function FeedView({ feeds, fetchedAt }: { feeds: BoardFeed[]; fet
                       <div className={styles.meta}>
                         <span>{p.author}</span>
                         <span>{formatKst(p.publishedAt)}</span>
+                        {p.excerpt && (
+                          <button
+                            type="button"
+                            className={styles.peek}
+                            onClick={() => toggle(key)}
+                            aria-expanded={isOpen}
+                            aria-controls={`ex-${key}`}
+                          >
+                            {isOpen ? "본문 접기" : "본문 보기"}
+                          </button>
+                        )}
                       </div>
+                      {isOpen && (
+                        <div id={`ex-${key}`} className={styles.excerpt}>
+                          <p>{p.excerpt}</p>
+                          <a href={p.url} target="_blank" rel="noopener noreferrer">
+                            원문에서 계속 읽기 ↗
+                          </a>
+                        </div>
+                      )}
                     </div>
                     <div className={styles.stats}>
                       <span className={`${styles.like} ${p.likes > 0 ? styles.likeOn : ""}`} title="추천">
@@ -143,7 +175,8 @@ export default function FeedView({ feeds, fetchedAt }: { feeds: BoardFeed[]; fet
                       <span title="조회">조회 {p.views.toLocaleString("ko-KR")}</span>
                     </div>
                   </li>
-                ))}
+                  );
+                })}
               </ol>
             )}
           </section>
@@ -151,7 +184,8 @@ export default function FeedView({ feeds, fetchedAt }: { feeds: BoardFeed[]; fet
       </main>
 
       <footer className={styles.footer}>
-        각 사이트의 공개 RSS 로 가져온 제목과 링크만 표시합니다. 글 내용은 원본 사이트에서 확인하세요.
+        게시판별 최신글을 반응(추천·댓글·조회) 기준으로 정렬합니다. 제목·본문 앞부분은 각 사이트의 공개 RSS에서
+        10분마다 새로 받아오며 따로 저장하지 않습니다. 전체 글은 원본 사이트에서 확인하세요.
       </footer>
     </div>
   );

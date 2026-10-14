@@ -40,7 +40,7 @@
 html,
 body {
   max-width: 100vw;
-  overflow-x: hidden;
+  overflow-x: clip; /* hidden 은 body 를 스크롤 컨테이너로 만들어 상단 sticky 고정이 깨짐 */
 }
 
 body {
